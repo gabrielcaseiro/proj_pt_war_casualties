@@ -1,0 +1,165 @@
+library(tidyverse)
+library(readxl)
+library(fixest)
+library(data.table)
+
+
+
+dt_elei<-readRDS('data/eleicoes/df_eleicoes_legislativas.rds')
+
+mun_id<-dt_elei |> 
+  select(geo_type,geo_name,geo_code) |> 
+  mutate(id_c=str_pad(geo_code,4,'left',0)) |> 
+  unique()
+    
+pop_sex<-read_xlsx('data/ine/Municipios_Populacao_residente_segundo_os_Censos__total_e_por_sexo.xlsx',
+                   sheet = 1,skip = 10)
+    
+  pop_sex<-pop_sex |> 
+    select(1:20)
+  
+    cols<-data.frame(cols=colnames(pop_sex),anos=as.character(pop_sex[1,]))
+      cols<-cols |> 
+        mutate(ind=cumsum(!grepl('[.]',cols)),
+               anos=gsub('┴ ','',anos)) |> 
+        group_by(ind) |>
+        mutate(cols=paste0(cols[1],'_',anos)) |> 
+        ungroup()
+      
+    pop_sex<-pop_sex[-1,]  
+    colnames(pop_sex)<-cols$cols
+    colnames(pop_sex)[1:2]<-c('geo_type','geo_name')
+      pop_sex<-pop_sex |> 
+        filter(!is.na(`Masculino_1960`))
+    
+    dt_elei<-dt_elei |> 
+      left_join(pop_sex |> 
+                  select(c(1,2,contains('1960'))))
+    
+    
+pop_age<-read_xlsx('data/ine/Municipios_Populacao_residente_segundo_os_Censos__total_e_por_grupo_etario.xlsx',
+                   sheet = 1,skip = 10)
+
+  pop_age<-pop_age |> 
+    select(1:104)
+  
+    cols<-data.frame(cols=colnames(pop_age),anos=as.character(pop_age[1,]))
+      cols<-cols |> 
+        mutate(ind=cumsum(!grepl('[.]',cols)),
+               anos=gsub('┴ ','',anos)) |> 
+        group_by(ind) |>
+        mutate(cols=paste0(cols[1],'_',anos)) |> 
+        ungroup()
+  
+  pop_age<-pop_age[-1,]  
+  colnames(pop_age)<-cols$cols
+  colnames(pop_age)[1:2]<-c('geo_type','geo_name')
+    pop_age<-pop_age |> 
+      filter(!is.na(Total_2021),!is.na(geo_name))
+  
+    dt_elei<-dt_elei |> 
+      left_join(pop_age |> 
+                  select(c(1,2,contains('1960'))))
+    
+    
+      
+      
+      dt_elei_mun<-dt_elei |> 
+        filter(geo_type=='Município') |> 
+        mutate(geo_code_sub=as.numeric(str_sub(geo_code,1,1))) |> 
+        filter(geo_code_sub<3)
+      
+      
+      
+data<-readRDS('data/tab_mortos_em_campanha_merged.rds')    
+        
+    data<-data |> 
+      #mutate(geo_code=ifelse(is.na(id_c_new),id_c,id_c_new)) |> 
+      mutate(geo_code=id_c) |> 
+      filter(!is.na(geo_code)) |> 
+      group_by(geo_code) |> 
+      summarise(n_mortos=n()) |> 
+      ungroup()
+    
+    
+    dt_elei_mun<-dt_elei_mun |> 
+      left_join(data)
+    
+    dt_elei_mun <- dt_elei_mun |> 
+      mutate(n_mortos_1=n_mortos/Masculino_1960,
+             n_mortos_2=n_mortos/`15-19_1960`,
+             youth_1960=`15-19_1960`+`20-24_1960`+`25-29_1960`,
+             n_mortos_3=n_mortos/youth_1960,
+             pop_1960=as.numeric(Total_1960))
+  
+    dt_elei_mun<-dt_elei_mun |> filter(!is.infinite(n_mortos_1),!is.na(n_mortos_1))
+    
+    
+    reg<-feols(votes_share ~ i(year,n_mortos,ref = 2022) + i(year,youth_1960,ref = 2022) | year + geo_code ,
+               dt_elei_mun |> filter(party=='PS'),
+               cluster = 'geo_code')
+    
+    
+    summary(reg)
+    
+    years<-unique(dt_elei_mun$year[dt_elei_mun$party%in%c("CH")])
+    
+    years<-unique(dt_elei_mun$year[grepl('PSD',dt_elei_mun$party)])
+    
+    
+    reg_coef<-lapply(years, function(y){
+    
+    reg<-lm(votes_share ~ n_mortos + youth_1960 ,
+            dt_elei_mun |> filter(party=='CH',year==y)
+            )
+    
+    t<-as.data.frame(coeftable(reg))
+      t<-rownames_to_column(t)
+      t$year<-y
+      
+      return(t)
+      
+    })
+    
+    reg_coef<-do.call(bind_rows,reg_coef)
+    
+    reg<-lm(votes_share ~ n_mortos_3 + youth_1960 + pop_1960 ,
+            dt_elei_mun |> filter(party=='PCP-PEV',year==2019)
+    )
+    
+    summary(reg)
+    
+    
+    
+    
+    data_mun<-data |> 
+      mutate(id_c=ifelse(is.na(id_c_new),id_c,id_c_new)) |> 
+      filter(!is.na(id_c)) |> 
+      group_by(id_c) |> 
+      summarise(n_mortos=n()) |> 
+      ungroup()
+    
+    
+    map<-read_sf('data/dgterritorio/Version 1.0','Cont_Freg_V1')
+    
+    
+    
+    map_mun<-map |> 
+      mutate(id_c=str_sub(DICOFRE,1,4)) |> 
+      group_by(CONCELHO,id_c) |> 
+      summarise(geometry=st_union(geometry)) |> 
+      ungroup() |> 
+      left_join(data_mun)
+    
+    pop_age_60<-pop_age |> 
+      left_join(mun_id) |> 
+      select(c(id_c,contains('1960')))
+    
+    map_mun<-map_mun |> 
+      #left_join(pop_age_60) |> 
+      mutate( youth_1960=`15-19_1960`+`20-24_1960`+`25-29_1960`,
+              n_mortos_rel1=1000*n_mortos/youth_1960,
+              n_mortos_rel2=1000*n_mortos/as.numeric(Total_1960))
+    
+    
+    

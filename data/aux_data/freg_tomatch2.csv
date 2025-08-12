@@ -1,0 +1,328 @@
+"FREGUESIA.x","CONCELHO","id_c","query"
+"ALHADA","RIBEIRA BRAVA","3107","You are matching parish names (freguesias) within the municipality (concelho) of 'RIBEIRA BRAVA' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- SERRA DE AGUA
+- TABUA
+- RIBEIRA BRAVA
+- CAMPANARIO
+
+Does the name 'ALHADA' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"ALMAGREIRA","LAJES DO PICO","4601","You are matching parish names (freguesias) within the municipality (concelho) of 'LAJES DO PICO' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- S. JOAO
+- LAJES DO PICO
+- RIBEIRINHA
+- RIBEIRAS
+- PIEDADE
+- CALHETA DE NESQUIM
+
+Does the name 'ALMAGREIRA' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"CAMPO DE BAIXO","PORTO S.","3201","You are matching parish names (freguesias) within the municipality (concelho) of 'PORTO S.' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- PORTO S.
+- ILHEUS (PORTO S.)
+
+Does the name 'CAMPO DE BAIXO' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"LOMBO DA PEDREIRA","NORDESTE","4202","You are matching parish names (freguesias) within the municipality (concelho) of 'NORDESTE' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- ACHADA
+- NORDESTINHO
+- ACHADINHA
+- SANTANA
+- LOMBA DA FAZENDA
+- SALGA
+- NORDESTE
+
+Does the name 'LOMBO DA PEDREIRA' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"MACHICO","FUNCHAL","3103","You are matching parish names (freguesias) within the municipality (concelho) of 'FUNCHAL' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- MONTE
+- S. ROQUE
+- S. ANTONIO
+- FUNCHAL (SANTA MARIA MAIOR)
+- S. GONCALO
+- IMACULADO CORACAO DE MARIA
+- FUNCHAL (SANTA LUZIA)
+- S. MARTINHO
+- FUNCHAL (S. PEDRO)
+- FUNCHAL (SE)
+- ILHEUS (SELVAGENS)
+- SELVAGEM GRANDE
+- SELVAGEM PEQUENA
+
+Does the name 'MACHICO' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"MAE DE DEUS","POVOACAO","4204","You are matching parish names (freguesias) within the municipality (concelho) of 'POVOACAO' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- POVOACAO
+- NOSSA SENHORA DOS REMEDIOS
+- FURNAS
+- AGUA RETORTA
+- FAIAL DA TERRA
+- RIBEIRA QUENTE
+
+Does the name 'MAE DE DEUS' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"NOSSA SENHORA DA CONCEICAO","RIBEIRA GRANDE","4205","You are matching parish names (freguesias) within the municipality (concelho) of 'RIBEIRA GRANDE' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- FENAIS DA AJUDA
+- LOMBA DE S. PEDRO
+- RIBEIRINHA
+- LOMBA DA MAIA
+- MAIA
+- PORTO FORMOSO
+- RIBEIRA GRANDE (MATRIZ)
+- S. BRAS
+- CALHETA
+- RIBEIRA GRANDE (CONCEICAO)
+- RIBEIRA SECA
+- RABO DE PEIXE
+- PICO DA PEDRA
+- SANTA BARBARA
+
+Does the name 'NOSSA SENHORA DA CONCEICAO' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"PONTA DO SOL","FUNCHAL","3103","You are matching parish names (freguesias) within the municipality (concelho) of 'FUNCHAL' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- MONTE
+- S. ROQUE
+- S. ANTONIO
+- FUNCHAL (SANTA MARIA MAIOR)
+- S. GONCALO
+- IMACULADO CORACAO DE MARIA
+- FUNCHAL (SANTA LUZIA)
+- S. MARTINHO
+- FUNCHAL (S. PEDRO)
+- FUNCHAL (SE)
+- ILHEUS (SELVAGENS)
+- SELVAGEM GRANDE
+- SELVAGEM PEQUENA
+
+Does the name 'PONTA DO SOL' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"PORTO MONIZ","FUNCHAL","3103","You are matching parish names (freguesias) within the municipality (concelho) of 'FUNCHAL' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- MONTE
+- S. ROQUE
+- S. ANTONIO
+- FUNCHAL (SANTA MARIA MAIOR)
+- S. GONCALO
+- IMACULADO CORACAO DE MARIA
+- FUNCHAL (SANTA LUZIA)
+- S. MARTINHO
+- FUNCHAL (S. PEDRO)
+- FUNCHAL (SE)
+- ILHEUS (SELVAGENS)
+- SELVAGEM GRANDE
+- SELVAGEM PEQUENA
+
+Does the name 'PORTO MONIZ' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"PRAIA DA VICTORIA","VILA PRAIA DA VITORIA","4302","You are matching parish names (freguesias) within the municipality (concelho) of 'VILA PRAIA DA VITORIA' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- BISCOITOS
+- AGUALVA
+- QUATRO RIBEIRAS
+- VILA NOVA
+- LAJES
+- S. BRAS
+- PRAIA DA VITORIA (SANTA CRUZ)
+- FONTINHAS
+- CABO DA PRAIA
+- FONTE DO BASTARDO
+
+Does the name 'PRAIA DA VICTORIA' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"RIBEIRA GRANDE","PONTA DELGADA","4203","You are matching parish names (freguesias) within the municipality (concelho) of 'PONTA DELGADA' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- BRETANHA
+- MOSTEIROS
+- REMEDIOS
+- SANTA BARBARA
+- SETE CIDADES
+- GINETES
+- S. ANTONIO
+- CAPELAS
+- CANDELARIA
+- FETEIRAS
+- S. VICENTE FERREIRA
+- FENAIS DA LUZ
+- ARRIFES
+- COVOADA
+- RELVA
+- FAJA DE CIMA
+- ROSTO DO CAO (S. ROQUE)
+- FAJA DE BAIXO
+- ROSTO DO CAO (LIVRAMENTO)
+- PONTA DELGADA (MATRIZ)
+- PONTA DELGADA (S. PEDRO)
+- PONTA DELGADA (S. JOSE)
+
+Does the name 'RIBEIRA GRANDE' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"RIBEIRA SECA","MACHICO","3104","You are matching parish names (freguesias) within the municipality (concelho) of 'MACHICO' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- PORTO DA CRUZ
+- MACHICO
+- CANICAL
+- S. ANTONIO DA SERRA
+- AGUA DE PENA
+
+Does the name 'RIBEIRA SECA' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"RIBEIRA SECA","PORTO MONIZ","3106","You are matching parish names (freguesias) within the municipality (concelho) of 'PORTO MONIZ' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- PORTO MONIZ
+- ACHADAS DA CRUZ
+- RIBEIRA DA JANELA
+- SEIXAL
+
+Does the name 'RIBEIRA SECA' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"RIBEIRO DO MELO","LAJES DO PICO","4601","You are matching parish names (freguesias) within the municipality (concelho) of 'LAJES DO PICO' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- S. JOAO
+- LAJES DO PICO
+- RIBEIRINHA
+- RIBEIRAS
+- PIEDADE
+- CALHETA DE NESQUIM
+
+Does the name 'RIBEIRO DO MELO' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"ROSARIO","S. VICENTE","3110","You are matching parish names (freguesias) within the municipality (concelho) of 'S. VICENTE' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- PONTA DELGADA
+- BOA VENTURA
+- S. VICENTE
+
+Does the name 'ROSARIO' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"S. JORGE","NORDESTE","4202","You are matching parish names (freguesias) within the municipality (concelho) of 'NORDESTE' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- ACHADA
+- NORDESTINHO
+- ACHADINHA
+- SANTANA
+- LOMBA DA FAZENDA
+- SALGA
+- NORDESTE
+
+Does the name 'S. JORGE' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"S. SEBASTIAO","PONTA DELGADA","4203","You are matching parish names (freguesias) within the municipality (concelho) of 'PONTA DELGADA' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- BRETANHA
+- MOSTEIROS
+- REMEDIOS
+- SANTA BARBARA
+- SETE CIDADES
+- GINETES
+- S. ANTONIO
+- CAPELAS
+- CANDELARIA
+- FETEIRAS
+- S. VICENTE FERREIRA
+- FENAIS DA LUZ
+- ARRIFES
+- COVOADA
+- RELVA
+- FAJA DE CIMA
+- ROSTO DO CAO (S. ROQUE)
+- FAJA DE BAIXO
+- ROSTO DO CAO (LIVRAMENTO)
+- PONTA DELGADA (MATRIZ)
+- PONTA DELGADA (S. PEDRO)
+- PONTA DELGADA (S. JOSE)
+
+Does the name 'S. SEBASTIAO' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"SANTA BARBARA","LAJES DO PICO","4601","You are matching parish names (freguesias) within the municipality (concelho) of 'LAJES DO PICO' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- S. JOAO
+- LAJES DO PICO
+- RIBEIRINHA
+- RIBEIRAS
+- PIEDADE
+- CALHETA DE NESQUIM
+
+Does the name 'SANTA BARBARA' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"SANTA MARIA","VILA DO PORTO","4101","You are matching parish names (freguesias) within the municipality (concelho) of 'VILA DO PORTO' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- SANTA BARBARA
+- S. PEDRO
+- VILA DO PORTO
+- S. ESPIRITO
+- ALMAGREIRA
+
+Does the name 'SANTA MARIA' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"SANTA MARIA MAYOR","FUNCHAL","3103","You are matching parish names (freguesias) within the municipality (concelho) of 'FUNCHAL' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- MONTE
+- S. ROQUE
+- S. ANTONIO
+- FUNCHAL (SANTA MARIA MAIOR)
+- S. GONCALO
+- IMACULADO CORACAO DE MARIA
+- FUNCHAL (SANTA LUZIA)
+- S. MARTINHO
+- FUNCHAL (S. PEDRO)
+- FUNCHAL (SE)
+- ILHEUS (SELVAGENS)
+- SELVAGEM GRANDE
+- SELVAGEM PEQUENA
+
+Does the name 'SANTA MARIA MAYOR' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"SANTA MARIA MOIOS","FUNCHAL","3103","You are matching parish names (freguesias) within the municipality (concelho) of 'FUNCHAL' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- MONTE
+- S. ROQUE
+- S. ANTONIO
+- FUNCHAL (SANTA MARIA MAIOR)
+- S. GONCALO
+- IMACULADO CORACAO DE MARIA
+- FUNCHAL (SANTA LUZIA)
+- S. MARTINHO
+- FUNCHAL (S. PEDRO)
+- FUNCHAL (SE)
+- ILHEUS (SELVAGENS)
+- SELVAGEM GRANDE
+- SELVAGEM PEQUENA
+
+Does the name 'SANTA MARIA MOIOS' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"SANTANA","FUNCHAL","3103","You are matching parish names (freguesias) within the municipality (concelho) of 'FUNCHAL' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- MONTE
+- S. ROQUE
+- S. ANTONIO
+- FUNCHAL (SANTA MARIA MAIOR)
+- S. GONCALO
+- IMACULADO CORACAO DE MARIA
+- FUNCHAL (SANTA LUZIA)
+- S. MARTINHO
+- FUNCHAL (S. PEDRO)
+- FUNCHAL (SE)
+- ILHEUS (SELVAGENS)
+- SELVAGEM GRANDE
+- SELVAGEM PEQUENA
+
+Does the name 'SANTANA' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."
+"SITIO DO RANCHO","CAMARA DE LOBOS","3102","You are matching parish names (freguesias) within the municipality (concelho) of 'CAMARA DE LOBOS' in Portugal, using the official 2001 administrative divisions.
+Here is the list of official freguesias in this municipality:
+- CURRAL DAS FREIRAS
+- JARDIM DA SERRA / SANTIAGO
+- ESTREITO DE CAMARA DE LOBOS
+- CAMARA DE LOBOS
+- QUINTA GRANDE
+
+Does the name 'SITIO DO RANCHO' correspond to, or is it a possible variant, abbreviation, or old spelling of, any freguesia in this list?
+If yes, return the matching name(s) exactly as written in the list, comma-separated. If not, return 'NONE'. If there is ambiguity, list all plausible options, comma-separated. Do not invent new names."

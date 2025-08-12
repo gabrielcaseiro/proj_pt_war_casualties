@@ -1,0 +1,907 @@
+---
+title: "Preliminary Analysis"
+author: "Gabriel C. Caseiro"
+date: "`r Sys.Date()`"
+output:
+  bookdown::html_document2:
+    theme: default
+    toc: true
+    toc_float: true
+    fig_caption: yes
+    number_sections: false
+    code_folding: hide
+    self_contained: yes
+    mode: selfcontained
+---
+
+<!-- ============================================================
+Project: War and Democratization in Portugal
+File: 3_prelim_analysis.Rmd — Preliminary Descriptive Analysis
+Purpose:
+  Produce descriptive statistics, tables, and figures from the cleaned/
+  merged datasets on war casualties, electoral outcomes, and demographics.
+  Intended to inform modeling choices and sanity-check merges.
+
+Inputs:
+  - data/tab_mortos_em_campanha_merged.rds
+  - data/eleicoes/df_eleicoes_legislativas.rds
+  - data/eleicoes/df_eleicoes_turnout.rds
+  - data/ine/pop.rds
+
+Outputs:
+  - Figures and tables embedded in the rendered HTML
+  - (Optional) exported tables via kableExtra if chunks include write calls
+
+Dependencies:
+  - tidyverse, data.table, sf, fixest, knitr, kableExtra, ggpubr
+
+Render notes:
+  - YAML uses bookdown::html_document2 with TOC + floating TOC.
+  - Early chunk sets knitr options to suppress messages/warnings.
+  - Ensure the four input files exist (produced by 1_data_preprocessing.R and 2_merge.R).
+
+Author: Gabriel Caseiro (gabrielcaseiro99@gmail.com)
+Date: 2025-08-12
+============================================================ -->
+
+
+```{r}
+
+knitr::opts_chunk$set(message=F,warnings=F)
+
+library(tidyverse)
+library(sf)
+library(fixest)
+library(knitr)
+library(kableExtra)
+library(ggpubr)
+library(data.table)
+
+options(knitr.kable.NA = '-',scipen = 999)
+
+
+```
+
+
+## Descriptive Stats 
+
+```{r}
+
+# Load data:
+
+df<-readRDS('data/tab_mortos_em_campanha_merged.rds')
+
+
+```
+
+### General distribution
+
+```{r}
+
+translation <- c(
+  "Portugal (Continente)" = "Portugal (Continent)",
+  "Portugal (Açores)" = "Portugal (Azores)",
+  "Portugal (Madeira)" = "Portugal (Madeira)",
+  "Angola" = "Angola",
+  "Guiné-Bissau" = "Guinea-Bissau",
+  "Moçambique" = "Mozambique",
+  "Cabo Verde" = "Cape Verde",
+  "Índia Portuguesa" = "Portuguese India",
+  "São Tomé e Príncipe" = "Sao Tome and Principe",
+  "Brasil" = "Brazil",
+  "Macau" = "Macau",
+  "Marrocos" = "Morocco",
+  "República Democrática do Congo" = "Democratic Republic of the Congo",
+  "Senegal" = "Senegal",
+  "Espanha" = "Spain",
+  'Missing'='Missing'
+)
+
+tab<-df |> 
+  mutate(place=translation[ultramar],
+         place=ifelse(is.na(ultramar)&!is.na(id_c),'Portugal (Continent)',place),
+         place=ifelse(is.na(ultramar)&is.na(id_c),'Missing',place)) |> 
+  group_by(place) |> 
+  summarise(
+    Casualties=n()
+  ) |> 
+  ungroup() |> 
+  mutate(place=factor(place,levels = translation)) |> 
+  arrange(place) |> 
+  rename(`Place of Origin`=place)
+
+
+total_row <- tibble(
+  `Place of Origin` = factor("Total", levels = c(levels(tab$`Place of Origin`), "Total")),
+  Casualties = sum(tab$Casualties)
+)
+
+tab <- bind_rows(tab, total_row)
+
+# Save .tex:
+
+kbl <- tab |> 
+  kable(format = "latex",
+        booktabs = TRUE,
+        align = "lc",
+        linesep = "",
+        escape = FALSE) |> 
+  column_spec(1, bold = TRUE) |> 
+  row_spec(0, bold = TRUE) |> 
+  row_spec( nrow(tab)-1, extra_latex_after = "\\midrule") 
+
+
+save_kable(kbl,"output/tab_count_by_origin.tex")
+
+tab
+
+
+```
+
+
+```{r}
+
+dic<-c(
+  "Angola" = "Angola",
+  "Guine" = "Guinea-Bissau",
+  "Mocambique" = "Mozambique"
+)
+
+# Deaths by month and colony
+
+tab <- df |>
+  mutate(
+    colonia=dic[colonia]
+  ) |> 
+  group_by(colonia) |> 
+  summarise(Casualties=n()) |> 
+  ungroup() |> 
+  arrange(-Casualties) |> 
+  rename(Colony=colonia)
+
+kbl <- tab |> 
+  kable(format = "latex",
+        booktabs = TRUE,
+        align = "lc",
+        linesep = "",
+        escape = FALSE) |> 
+  column_spec(1, bold = TRUE) |> 
+  row_spec(0, bold = TRUE) 
+
+
+save_kable(kbl,"output/tab_count_by_colony.tex")
+
+tab
+
+
+```
+
+
+### Casualties Time Series
+
+```{r}
+
+# Deaths by month
+
+monthly_deaths <- df |>
+  mutate(dt_death = dmy(`Data do Falecimento`, locale = "pt_PT.UTF-8")) |>
+  filter(!is.na(dt_death),year(dt_death)%in%1961:1974) |>
+  mutate(month = floor_date(dt_death, "month")) |>
+  count(month, name = "deaths") |>
+  complete(month = seq(min(month), max(month), by = "month"), fill = list(deaths = 0)) |>
+  arrange(month)
+
+# plot time series
+ggplot(monthly_deaths, aes(x = month, y = deaths)) +
+  geom_line(size = .7) +
+  geom_point(size = 0.7, alpha = 0.6) +
+  scale_x_date(
+    date_breaks = "6 months",
+    date_labels = "%b %Y",
+    expand = expansion(mult = c(0.01, 0.01))
+  ) +
+  labs(
+    x = "Month of Death",
+    y = "Casualties"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+    )
+
+  ggsave('output/ts_casualties.png',units = 'px',width = 3000,height = 1500)
+
+
+```
+
+
+```{r}
+
+dic<-c(
+  "Angola" = "Angola",
+  "Guine" = "Guinea-Bissau",
+  "Mocambique" = "Mozambique"
+)
+
+# Deaths by month and colony
+
+monthly_deaths <- df |>
+  mutate(
+    dt_death = dmy(`Data do Falecimento`, locale = "pt_PT.UTF-8"),
+    colonia=dic[colonia]
+  ) |>
+  filter(!is.na(dt_death), year(dt_death) >= 1961, year(dt_death) <= 1974) |>
+  mutate(month = floor_date(dt_death, "month")) |>
+  group_by(colonia, month) |>
+  summarise(deaths = n(), .groups = "drop") |>
+  complete(
+    colonia,
+    month = seq.Date(floor_date(as.Date("1961-01-01"), "month"),
+                     floor_date(as.Date("1974-12-31"), "month"),
+                     by = "month"),
+    fill = list(deaths = 0)
+  ) |>
+  arrange(colonia, month)
+
+# plot time series
+ggplot(monthly_deaths, aes(x = month, y = deaths, 
+                           color = colonia,shape = colonia)) +
+  geom_line(size = .7) +
+  geom_point(size = 0.7, alpha = 0.6) +
+  scale_color_grey(name = "Colony") +
+  scale_shape(name = "Colony")+
+  scale_x_date(
+    date_breaks = "6 months",
+    date_labels = "%b %Y",
+    expand = expansion(add = c(0, 60)) 
+  ) +
+  labs(
+    x = "Month of death",
+    y = "Number of deaths"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom"  
+  ) 
+
+  ggsave('output/ts_casualties_by_colony.png',units = 'px',width = 3000,height = 1500)
+
+
+```
+
+
+### Mainland Map
+
+#### Concelho
+
+```{r}
+
+    df_c<-df |> 
+      mutate(id_c=ifelse(!is.na(id_c_new),id_c_new,id_c)) |> 
+      filter(!is.na(id_c)) |> 
+      group_by(id_c) |> 
+      summarise(Casualties=n()) |> 
+      ungroup()
+
+    pop<-readRDS('data/ine/pop.rds')
+    
+    pop<-pop |> 
+          select(id_c,
+                 Total_1960,Masculino_1960,
+                 `05-09_1960`,`10-14_1960`,`15-19_1960`,`20-24_1960`,`25-29_1960`) |> 
+      mutate(Total_1960=as.numeric(Total_1960)) |> 
+      group_by(id_c) |> 
+      summarise(across(everything(),\(x) sum(x, na.rm = TRUE))) |> 
+      ungroup()
+    
+    df_c<-df_c |> 
+      left_join(
+        pop |> 
+          filter(!Total_1960==0)
+      )
+    
+    df_c<-df_c |> 
+      mutate(n_mortos_1=Casualties/Masculino_1960,
+             n_mortos_2=Casualties/`15-19_1960`,
+             youth_1960= `05-09_1960`,`10-14_1960`,`15-19_1960`,
+             n_mortos_3=Casualties/youth_1960,
+             pop_1960=as.numeric(Total_1960))
+  
+  
+
+```
+
+
+```{r}
+
+  files<-list.files('data/dgterritorio/Version 1.0','shp')
+    files<-gsub('[.]shp','',files)
+    
+  crs<-st_crs( read_sf('data/dgterritorio/Version 1.0',files[5]))  
+  
+  map<-lapply(files, function(f){
+    
+    read_sf('data/dgterritorio/Version 1.0',f) |> 
+    st_transform(crs)
+    
+  })
+  
+  map<-do.call(bind_rows,map)
+  
+  map<-map|> 
+    rename(id_f=DICOFRE) |> 
+    mutate(id_c=str_sub(id_f,1,4),
+           NUT3=ifelse(id_c=='0314','AVE',NUT3)) |> 
+    select(NUT1,NUT2,NUT3,id_f,id_c,FREGUESIA,CONCELHO)
+  
+  map_c<-map |> 
+    group_by(NUT1,NUT2,NUT3,id_c,CONCELHO) |> 
+    summarise(geometry=st_union(geometry)) |> 
+    ungroup()
+  
+  
+  map_c<-map_c |> 
+    left_join(df_c)
+  
+  
+  plot<-map_c |> 
+      filter(NUT1=="CONTINENTE") |> 
+      ggplot(aes(fill = Casualties))+
+      geom_sf()+
+      scale_fill_gradient(
+      trans = "log10",
+      breaks = c(1, 10, 100, 200),
+      low = 'white',
+      high = 'darkred',
+      name = "Casualties\n(log10)"
+    )+
+      theme_void()
+  
+  plot
+    
+  ggsave('output/map_continent_casualties_n.png',units = 'px',width = 2000,height = 3000)
+
+
+```
+
+```{r}
+
+  
+  plot<-map_c |> 
+      filter(NUT1=="CONTINENTE") |> 
+      ggplot(aes(fill = n_mortos_1))+
+      geom_sf()+
+      scale_fill_gradient(
+      labels = scales::percent_format(scale = 100),
+      low = 'white',
+      high = 'darkred',
+      name = "Casualties\n(% of 1960\nmale population)"
+    )+
+      theme_void()
+
+  plot
+
+  ggsave('output/map_continent_casualties_mpop.png',units = 'px',width = 2000,height = 3000)
+  
+
+```
+
+
+```{r}
+
+  
+  plot<-map_c |> 
+      filter(NUT1=="CONTINENTE") |> 
+      ggplot(aes(fill = n_mortos_3))+
+      geom_sf()+
+      scale_fill_gradient(
+      labels = scales::percent_format(scale = 100),
+      low = 'white',
+      high = 'darkred',
+      name = "Casualties\n(% of 1960 population\nages 5–19)"
+    )+
+      theme_void()
+  
+  plot
+  
+  ggsave('output/map_continent_casualties_ypop.png',units = 'px',width = 2000,height = 3000)
+
+
+```
+
+#### Freguesia
+
+
+```{r}
+
+df_f <- df |>
+  mutate(
+    id_c = coalesce(id_c_new, id_c)  
+  ) |>
+  filter(!is.na(id_c)) |>
+  mutate(
+    id_f = map(id_f, function(x) {
+      # turn NULL into NA, flatten lists, ensure character vector
+      if (is.null(x)) return(NA_character_)
+      if (is.list(x)) x <- unlist(x)
+      as.character(x)
+    })
+  ) |>
+  unnest(id_f) |> 
+  group_by(id_c,id_f) |> 
+  summarise(Casualties_count=n()) |> 
+  ungroup() |> 
+  mutate(Casualties=1)
+
+
+map_f<-map|> 
+  filter(NUT1=="CONTINENTE") |> 
+  left_join(df_f) |> 
+  mutate(Casualties=coalesce(Casualties,0))
+
+
+  map_f |> 
+      ggplot(aes(fill = factor(Casualties)))+
+      geom_sf()+
+      scale_fill_manual(
+        name = "Parish with\ncasualty",
+        values = c('1' = "#B22222", '0' = "grey90"),
+        labels = c('1' ="Yes", '0' ="No"),
+        guide = guide_legend(reverse = TRUE)
+      )+
+    theme_void() 
+  
+    ggsave('output/map_continent_f_casualties_ind.png',units = 'px',width = 2000,height = 3000)
+
+```
+
+```{r}
+
+  mean(map_f$Casualties)
+
+```
+
+
+
+
+## Regressions
+
+```{r}
+
+# Auxiliary functions:
+
+get_stats<-function(t,var_name){
+  
+    data.frame(
+      'Estimate'=t$coefficients[var_name],
+      'Std.Error'=t$se[var_name],
+      "P-value"=pvalue(t)[var_name],
+      "Obs."=t$nobs
+    )
+    
+}
+
+
+stars<-function(x){ ifelse(x < .001, "***",
+         ifelse(x < .01,  "**",
+         ifelse(x < .05,  "*",
+         ifelse(x < .10,  ".", ""))))
+  
+}
+
+```
+
+### Electoral Results
+
+```{r}
+
+# Load electoral data:
+
+dt_elei<-readRDS('data/eleicoes/df_eleicoes_legislativas.rds')
+
+  dt_elei<-dt_elei |> 
+    mutate(party=ifelse(party=='BE','B.E.',party))
+
+parties<-list(
+  '1976'=c("PS","PPD","CDS","PCP","UDP"),
+  '1999'=c("PS","PPD/PSD","CDS-PP","PCP-PEV","B.E."),
+  '2022'=c("PS","PPD/PSD","CDS-PP","PCP-PEV","B.E.","CH")
+)
+
+```
+
+
+#### Casualties (% of 1960 population ages 5–19)
+
+```{r}
+# Define and estimate models:
+
+  reg<-lapply(names(parties), function(y){
+    
+  data<-dt_elei |> 
+    filter(
+      year==y
+      ) |> 
+    rename(id_c=geo_code) |> 
+    right_join(
+      map_c |> 
+        st_drop_geometry()
+    ) |> 
+    filter(!is.na(Total_1960)) |> 
+    mutate(
+      n_mortos_3_sd=scale(n_mortos_3)
+    )
+    
+      l<-lapply(parties[[y]], function(p){
+      
+        r<-feols(votes_share ~ n_mortos_3_sd | NUT2,
+              data = data |> filter(party==p) , se= 'hetero')
+        
+        r<-get_stats(r,'n_mortos_3_sd')
+        
+        r$`Mean DV`<- mean(data$votes_share[data$party==p])
+        
+        return(r)
+        
+        })
+      
+    names(l)<-parties[[1]]  
+    
+    return(l)
+      
+  })
+  
+  names(reg)<-names(parties)
+  
+  reg<-unlist(reg, recursive = FALSE)
+  
+```
+
+
+```{r}
+
+# Results Table
+
+tab<-rbindlist(reg,idcol = T)
+  
+  tab<-tab |> 
+    pivot_longer(-1) |> 
+    mutate(Party=str_sub(.id,6,-1),
+           Election=str_sub(.id,1,4)) |> 
+    select(-.id)
+  
+      tab<-tab |> 
+      group_by(Party,Election) |> 
+      mutate(value=sub("\\.?0+$", "", 
+                       format(round(value,3), trim = TRUE, scientific = FALSE)),
+             value=ifelse(name=='Estimate',
+                          paste0(value,stars(value[name=='P.value'])),
+                          value),
+             value=ifelse(name=='Std.Error',
+                          paste0('(',value,')'),
+                          value)) |> 
+      ungroup() |> 
+        mutate(Party=ifelse(Party=='NA','CH',Party))
+  
+  tab<-tab |> 
+    pivot_wider(names_from = 'Party',values_from = 'value') |> 
+    filter(!name=='P.value') |> 
+    mutate(name=ifelse(name%in%c('Estimate','Std.Error'),
+                            '',name))
+  colnames(tab)[1]<-' '
+  
+  n_tab<-4
+  
+  kbl <- tab |> 
+  select(-Election) |>   
+  kable(format = "latex",
+        booktabs = TRUE,
+        align = "lccccccccc",
+        linesep = "",
+        escape = FALSE) |> 
+  column_spec(1, bold = TRUE) |> 
+  group_rows("Panel A: 1976 Election", 1, n_tab) |> 
+  group_rows("Panel B: 1999 Election", n_tab + 1, 2 * n_tab) |> 
+  group_rows("Panel C: 2022 Election", 2 * n_tab + 1, 3 * n_tab) |> 
+  row_spec(n_tab, extra_latex_after = "\\hline \\bottomrule") |> 
+  row_spec( 2 * n_tab, extra_latex_after = "\\hline \\bottomrule") |> 
+  row_spec( 3 * n_tab, extra_latex_after = "\\bottomrule") |> 
+  row_spec(n_tab-2, extra_latex_after = "\\midrule") |> 
+  row_spec( 2 * n_tab-2, extra_latex_after = "\\midrule") |> 
+  row_spec( 3 * n_tab-2, extra_latex_after = "\\midrule") 
+  
+  save_kable(kbl,"output/tab_elections_results_ypop.tex")
+  
+  tab
+
+  
+```
+
+
+#### Casualties (% of 1960 male population)
+
+```{r}
+# Define and estimate models:
+
+  reg<-lapply(names(parties), function(y){
+    
+  data<-dt_elei |> 
+    filter(
+      year==y
+      ) |> 
+    rename(id_c=geo_code) |> 
+    right_join(
+      map_c |> 
+        st_drop_geometry()
+    ) |> 
+    filter(!is.na(Total_1960)) |> 
+    mutate(
+      n_mortos_1_sd=scale(n_mortos_1)
+    )
+    
+      l<-lapply(parties[[y]], function(p){
+      
+        r<-feols(votes_share ~ n_mortos_1_sd | NUT2,
+              data = data |> filter(party==p) , se= 'hetero')
+        
+        r<-get_stats(r,'n_mortos_1_sd')
+        
+        r$`Mean DV`<- mean(data$votes_share[data$party==p])
+        
+        return(r)
+        
+        })
+      
+    names(l)<-parties[[1]]  
+    
+    return(l)
+      
+  })
+  
+  names(reg)<-names(parties)
+  
+  reg<-unlist(reg, recursive = FALSE)
+  
+```
+
+
+```{r}
+
+# Results Table
+
+tab<-rbindlist(reg,idcol = T)
+  
+  tab<-tab |> 
+    pivot_longer(-1) |> 
+    mutate(Party=str_sub(.id,6,-1),
+           Election=str_sub(.id,1,4)) |> 
+    select(-.id)
+  
+      tab<-tab |> 
+      group_by(Party,Election) |> 
+      mutate(value=sub("\\.?0+$", "", 
+                       format(round(value,3), trim = TRUE, scientific = FALSE)),
+             value=ifelse(name=='Estimate',
+                          paste0(value,stars(value[name=='P.value'])),
+                          value),
+             value=ifelse(name=='Std.Error',
+                          paste0('(',value,')'),
+                          value)) |> 
+      ungroup()|> 
+        mutate(Party=ifelse(Party=='NA','CH',Party))
+  
+  tab<-tab |> 
+    pivot_wider(names_from = 'Party',values_from = 'value') |> 
+    filter(!name=='P.value') |> 
+    mutate(name=ifelse(name%in%c('Estimate','Std.Error'),
+                            '',name))
+  colnames(tab)[1]<-' '
+  
+  n_tab<-4
+  
+  kbl <- tab |> 
+  select(-Election) |>   
+  kable(format = "latex",
+        booktabs = TRUE,
+        align = "lccccccccc",
+        linesep = "",
+        escape = FALSE) |> 
+  column_spec(1, bold = TRUE) |> 
+  group_rows("Panel A: 1976 Election", 1, n_tab) |> 
+  group_rows("Panel B: 1999 Election", n_tab + 1, 2 * n_tab) |> 
+  group_rows("Panel C: 2022 Election", 2 * n_tab + 1, 3 * n_tab) |> 
+  row_spec(n_tab, extra_latex_after = "\\hline \\bottomrule") |> 
+  row_spec( 2 * n_tab, extra_latex_after = "\\hline \\bottomrule") |> 
+  row_spec( 3 * n_tab, extra_latex_after = "\\bottomrule") |> 
+  row_spec(n_tab-2, extra_latex_after = "\\midrule") |> 
+  row_spec( 2 * n_tab-2, extra_latex_after = "\\midrule") |> 
+  row_spec( 3 * n_tab-2, extra_latex_after = "\\midrule") 
+  
+  save_kable(kbl,"output/tab_elections_results_mpop.tex")
+  
+  tab
+
+  
+```
+
+
+
+### Electoral Turnout
+
+```{r}
+# Load data:
+
+dt_turnout<-readRDS('data/eleicoes/df_eleicoes_turnout.rds')
+
+```
+
+#### Casualties (% of 1960 population ages 5–19)
+
+```{r}
+
+data<-dt_turnout |> 
+  rename(id_c=geo_code) |> 
+  right_join(
+    map_c |> 
+      st_drop_geometry()
+  ) |> 
+  filter(!is.na(Total_1960)) |> 
+  mutate(
+    n_mortos_3_sd=scale(n_mortos_3)
+    )
+
+  reg<-list()
+
+  reg[[1]]<-feols(100*turnout_1976/tot_1976 ~ n_mortos_3_sd | NUT2,
+             data = data , se= 'hetero')
+  
+    reg[[1]]<-get_stats(reg[[1]])
+    reg[[1]]$`Mean DV`<-mean(100*data$turnout_1976/data$tot_1976)
+
+  reg[[2]]<-feols(100*turnout_1999/tot_1999 ~ n_mortos_3_sd | NUT2,
+             data = data , se= 'hetero')
+  
+    reg[[2]]<-get_stats(reg[[2]])
+    reg[[2]]$`Mean DV`<-mean(100*data$turnout_1999/data$tot_1999)
+  
+  reg[[3]]<-feols(100*turnout_2022/tot_2022 ~ n_mortos_3_sd | NUT2,
+             data = data , se= 'hetero')
+  
+    reg[[3]]<-get_stats(reg[[3]])
+    reg[[3]]$`Mean DV`<-mean(100*data$turnout_2022/data$tot_2022)
+  
+  names(reg)<-c('1976','1999','2022')
+
+
+```
+```{r}
+# Results Table
+
+tab<-rbindlist(reg,idcol = T)
+  
+  tab<-tab |> 
+    pivot_longer(-1) |> 
+    mutate(Election=.id) |> 
+    select(-.id)
+  
+      tab<-tab |> 
+      group_by(Election) |> 
+      mutate(value=sub("\\.?0+$", "", 
+                       format(round(value,3), trim = TRUE, scientific = FALSE)),
+             value=ifelse(name=='Estimate',
+                          paste0(value,stars(value[name=='P.value'])),
+                          value),
+             value=ifelse(name=='Std.Error',
+                          paste0('(',value,')'),
+                          value)) |> 
+      ungroup()
+  
+  tab<-tab |> 
+    pivot_wider(names_from = 'Election',values_from = 'value') |> 
+    filter(!name=='P.value') |> 
+    mutate(name=ifelse(name%in%c('Estimate','Std.Error'),
+                            '',name))
+  colnames(tab)[1]<-' '
+  
+  tab_all<-tab
+```
+
+#### Casualties (% of 1960 male population)
+
+```{r}
+
+data<-dt_turnout |> 
+  rename(id_c=geo_code) |> 
+  right_join(
+    map_c |> 
+      st_drop_geometry()
+  ) |> 
+  filter(!is.na(Total_1960)) |> 
+  mutate(
+    n_mortos_1_sd=scale(n_mortos_1)
+    )
+
+  reg<-list()
+
+  reg[[1]]<-feols(100*turnout_1976/tot_1976 ~ n_mortos_1_sd | NUT2,
+             data = data , se= 'hetero')
+  
+    reg[[1]]<-get_stats(reg[[1]])
+    reg[[1]]$`Mean DV`<-mean(100*data$turnout_1976/data$tot_1976)
+
+  reg[[2]]<-feols(100*turnout_1999/tot_1999 ~ n_mortos_1_sd | NUT2,
+             data = data , se= 'hetero')
+  
+    reg[[2]]<-get_stats(reg[[2]])
+    reg[[2]]$`Mean DV`<-mean(100*data$turnout_1999/data$tot_1999)
+  
+  reg[[3]]<-feols(100*turnout_2022/tot_2022 ~ n_mortos_1_sd | NUT2,
+             data = data , se= 'hetero')
+  
+    reg[[3]]<-get_stats(reg[[3]])
+    reg[[3]]$`Mean DV`<-mean(100*data$turnout_2022/data$tot_2022)
+  
+  names(reg)<-c('1976','1999','2022')
+
+
+```
+```{r}
+# Results Table
+
+tab<-rbindlist(reg,idcol = T)
+  
+  tab<-tab |> 
+    pivot_longer(-1) |> 
+    mutate(Election=.id) |> 
+    select(-.id)
+  
+      tab<-tab |> 
+      group_by(Election) |> 
+      mutate(value=sub("\\.?0+$", "", 
+                       format(round(value,3), trim = TRUE, scientific = FALSE)),
+             value=ifelse(name=='Estimate',
+                          paste0(value,stars(value[name=='P.value'])),
+                          value),
+             value=ifelse(name=='Std.Error',
+                          paste0('(',value,')'),
+                          value)) |> 
+      ungroup()
+  
+  tab<-tab |> 
+    pivot_wider(names_from = 'Election',values_from = 'value') |> 
+    filter(!name=='P.value') |> 
+    mutate(name=ifelse(name%in%c('Estimate','Std.Error'),
+                            '',name))
+  colnames(tab)[1]<-' '
+  
+  tab_all<-bind_rows(tab_all,tab)
+```
+
+
+
+```{r}
+n_tab<-4
+  
+  kbl <- tab_all |> 
+  kable(format = "latex",
+        booktabs = TRUE,
+        align = "lccc",
+        linesep = "",
+        escape = FALSE) |> 
+  column_spec(1, bold = TRUE) |> 
+  group_rows("Panel A: Casualties (% of 1960 population ages 5–19)", 1, n_tab) |> 
+  group_rows("Panel B: Casualties (% of 1960 male population)", n_tab + 1, 2 * n_tab) |> 
+  row_spec(n_tab, extra_latex_after = "\\hline \\bottomrule") |> 
+  row_spec( 2 * n_tab, extra_latex_after = "\\bottomrule") |> 
+  row_spec(n_tab-2, extra_latex_after = "\\midrule") |> 
+  row_spec( 2 * n_tab-2, extra_latex_after = "\\midrule")
+
+  save_kable(kbl,"output/tab_elections_turnout.tex")
+  
+  tab_all
+
+  
+```
+
+
